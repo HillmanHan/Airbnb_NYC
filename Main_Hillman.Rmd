@@ -1,0 +1,50 @@
+---
+title: "Airbnb"
+author: "Team39"
+date: '2022-09-27'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load data and packages 
+```{r}
+library(ggplot2)
+library(dplyr)
+library(corrplot)
+library(Rmisc)
+library(ragtop)
+library(readxl)
+
+Airdf <- read_excel(file.choose()) #Use Airbnb_Open_Data.csv
+summary(Airdf)
+
+numV <- which(sapply(Airdf, is.numeric))
+numVnames <- names(numV)
+catV <- which(sapply(Airdf, is.character))
+catVnames <- names(catV)
+cat("There are ", length(numV), "numeric variables and ", length(catV), "categorical variables in this dataset")
+```
+
+Identify NAs
+```{r}
+colSums(is.na(Airdf)) #how many NAs in a column
+sum(colSums(is.na(Airdf))) #193504 total inputs with NAs
+#Yet there are some blank("") inputs that are not captured by the is.na function
+
+NAcolumns <- names(which(colSums(is.na(Airdf)) > 0 )) #which columns have NAs
+print(NAcolumns)
+cat('There are', length(names(which(colSums(is.na(Airdf)) > 0 ))), 'columns with NAs. ')
+
+getRid <- c("id", "NAME", "host.id", "host.name", "country","country.code", "house_rules", "license")
+
+Airdf1 <- Airdf %>%
+      select(-getRid)
+```
+We decide to get rid of these 8 columns in the original data set. The "id", "name", "host.id", "host.name", "license" columns are too trivial and have very little or no relation with the variable "review.rate.number" we are interested in from empirical perspective. "country" is just the "United States. The other column "house_rules" may be one of the factors that can impact review rate, but due to the difficulty in processing natural language and the the time we have, we decide not to include this column in our further analysis.
+
+
+
+
